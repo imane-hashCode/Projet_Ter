@@ -18,7 +18,7 @@ class VoeuxSerializer(serializers.ModelSerializer):
 
     def validate_score(self, data):
         """ Vérifie que la note est entre 1 et 10 """
-        if 1 <= data['note_preference'] <= 10:
+        if 1 <= data['note_preference'] <= 20:
             raise serializers.ValidationError("La note doit être entre 1 et 10.")
         return data
     

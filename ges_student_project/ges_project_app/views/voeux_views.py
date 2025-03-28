@@ -12,8 +12,11 @@ class VoeuxViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Un étudiant ne peut voir que ses propres préférences
-        return Voeux.objects.filter(student=self.request.user.student)
+        # Un étudiant ne peut voir que ses propres voeux
+        user = self.request.user
+        
+        if user.is_authenticated and user.role == 'student':
+            return Voeux.objects.filter(student=user.student)
 
     @action(detail=False, methods=['post'])
     def submit_voeux(self, request):

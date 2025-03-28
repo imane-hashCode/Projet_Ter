@@ -38,10 +38,6 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.user.username} ({self.level})"
 
-# class Supervisor(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
 class Project(models.Model):
     code = models.CharField(max_length=10, unique=True)
     title = models.CharField(max_length=255)
@@ -49,6 +45,7 @@ class Project(models.Model):
     number_groups = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     supervisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='project')
     level = models.CharField(max_length=5, choices=LEVEL_CHOICES, default='null')
+    priority = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -94,11 +91,18 @@ class Conflit(models.Model):
         return f"Conflit: {self.student} vs {self.project} ({self.statut})"
 
 
-class Assignment(models.Model):
+class ProjectAssignment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="assignments")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="assignments")
     assignment_date = models.DateTimeField(auto_now_add=True)
-    statut = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
+
+    class Meta:
+        unique_together = ('student', 'project')  # Un étudiant ne peut avoir qu'un seul projet
+        indexes = [
+        models.Index(fields=['student']),
+        models.Index(fields=['project']),
+    ]
 
     def __str__(self):
         return f"Assignment: {self.student} -> {self.project} ({self.statut})"

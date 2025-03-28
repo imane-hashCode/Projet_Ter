@@ -6,7 +6,8 @@ import Dashboard from './pages/dashboards/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import ProjectList from './pages/studentPages/Projects'
 import VoeuxPage from './pages/studentPages/Voeux';
-import AddProjectPage from './pages/projectPages/AddProjectPage';
+import ProjectDetail from './pages/studentPages/ProjectDetail'
+import ProjectListPage from './pages/projectPages/ProjectListPage';
 
 const AppRoutes = () => {
     return (
@@ -15,14 +16,8 @@ const AppRoutes = () => {
                 {/* <Route exact path="/" element={Home} /> */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/projects" element={<ProjectList />} />
-                <Route
-                    path="/voeux"
-                    element={
-                        <PrivateRoute>
-                            <VoeuxPage />
-                        </PrivateRoute>
-                    }
-                />
+                <Route path="/voeux" element={ <VoeuxPage />}/>
+                <Route path="/projets/:id" element={<ProjectDetail />} />
                 <Route
                     path="/dashboard"
                     element={
@@ -32,10 +27,10 @@ const AppRoutes = () => {
                     }
                 />
                 <Route
-                    path="/add-project"
+                    path="/projects_listes"
                     element={
                         <PrivateRoute>
-                            <AddProjectPage />
+                            <ProjectListPage />
                         </PrivateRoute>
                     }
                 />
