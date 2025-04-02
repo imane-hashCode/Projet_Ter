@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ProjectCard from './ProjectCard';
 import AddTeamModal from './AddTeamModal';
 import AddProjectModal from './AddProjectModal'
+import EditProjectModal from './EditProjectModal'
 import api from '../../api/axios';
 import SupervisorNavBar from '../../components/SupervisorNavBar';
 
@@ -9,6 +10,11 @@ const ProjectListPage = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
+    const [editModal, setEditModal] = useState({
+        isOpen: false,
+        projectId: null
+    });
     // Charger la liste des projets
     const [modalState, setModalState] = useState({
         isOpen: false,
@@ -62,7 +68,7 @@ const ProjectListPage = () => {
     const openProjectModal = () => {
         setIsProjectModalOpen({
             isOpen: true,
-            formData: { 
+            formData: {
                 title: '',
                 code: '',
                 description: '',
@@ -86,6 +92,25 @@ const ProjectListPage = () => {
                 [name]: name === 'name' ? value : parseInt(value)
             }
         }));
+    };
+
+    const handleUpdateProject = (updatedProject) => {
+        setProjects(projects.map(proj =>
+            proj.id === updatedProject.id ? updatedProject : proj
+        ));
+    };
+
+    // const handleEditProject = useCallback((projectId) => {
+    //     setEditModal({
+    //         isOpen: true,
+    //         projectId: projectId
+    //     });
+    // }, []);
+    const openEditModal = (projectId) => {
+        setEditModal({
+            isOpen: true,
+            projectId: projectId
+        });
     };
 
     const handleSubmit = async () => {
@@ -118,37 +143,39 @@ const ProjectListPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-        <SupervisorNavBar />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Liste des Projets</h1>
-                <div className="flex space-x-4">
-                    <button
-                        onClick={openProjectModal}
-                        className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
-                    >
-                        + Créer un projet
-                    </button>
+            <SupervisorNavBar />
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Liste des Projets</h1>
+                    <div className="flex space-x-4">
+                        <button
+                            onClick={openProjectModal}
+                            className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
+                        >
+                            + Créer un projet
+                        </button>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    {projects.length > 0 ? (
+                        projects.map(project => (
+                            <ProjectCard
+                                key={project.id}
+                                project={project}
+                                onEdit={openEditModal}
+                                projectId = {project.id}
+                                onAddTeam={() => openTeamModal(project)}
+                            />
+                        ))
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500 text-lg">Aucun projet disponible</p>
+                        </div>
+                    )}
                 </div>
             </div>
-
-            <div className="space-y-6">
-                {projects.length > 0 ? (
-                    projects.map(project => (
-                        <ProjectCard
-                            key={project.id}
-                            project={project}
-                            onAddTeam={() => openTeamModal(project)}
-                        />
-                    ))
-                ) : (
-                    <div className="text-center py-12">
-                        <p className="text-gray-500 text-lg">Aucun projet disponible</p>
-                    </div>
-                )}
-            </div>
-        </div>
 
             <AddTeamModal
                 isOpen={modalState.isOpen}
@@ -163,6 +190,13 @@ const ProjectListPage = () => {
                 isOpen={isProjectModalOpen}
                 onClose={() => setIsProjectModalOpen(false)}
                 onSubmit={handleProjectSubmit}
+            />
+
+            <EditProjectModal
+                isOpen={editModal.isOpen}
+                onClose={() => setEditModal({ isOpen: false, project: null })}
+                projectId={editModal.projectId}
+                onProjectUpdated={handleUpdateProject}
             />
         </div>
     );

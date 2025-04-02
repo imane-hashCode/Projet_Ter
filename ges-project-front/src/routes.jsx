@@ -8,6 +8,7 @@ import ProjectList from './pages/studentPages/Projects'
 import VoeuxPage from './pages/studentPages/Voeux';
 import ProjectDetail from './pages/studentPages/ProjectDetail'
 import ProjectListPage from './pages/projectPages/ProjectListPage';
+import AssignmentList from './pages/admin/AssignmentList'
 
 const AppRoutes = () => {
     return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
                 <Route path="/projects" element={<ProjectList />} />
                 <Route path="/voeux" element={ <VoeuxPage />}/>
                 <Route path="/projets/:id" element={<ProjectDetail />} />
+                <Route path="/assignment" element= { <AssignmentList /> } />
                 <Route
                     path="/dashboard"
                     element={

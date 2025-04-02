@@ -1,7 +1,7 @@
 import React from 'react';
-import { FiPlus, FiUser, FiAward, FiFlag, FiUsers, FiInfo } from 'react-icons/fi';
+import { FiPlus, FiUser, FiAward, FiFlag, FiUsers, FiInfo, FiEdit2 } from 'react-icons/fi';
 
-const ProjectCard = ({ project, onAddTeam }) => {
+const ProjectCard = ({ project, onEdit, onAddTeam, projectId }) => {
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full w-full border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="p-6 flex-grow">
@@ -69,13 +69,20 @@ const ProjectCard = ({ project, onAddTeam }) => {
             </div>
 
             {/* Bouton d'action */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                <button
+                    onClick={() => onEdit(projectId)}
+                    className="text-sm bg-blue-600 text-white hover:text-blue-800 flex items-center"
+                >
+                    <FiEdit2 className="mr-1" />
+                    Modifier Projet
+                </button>
                 <button
                     onClick={onAddTeam}
                     disabled={project.teams?.length >= project.number_groups}
                     className={`inline-flex items-center px-4 py-2 rounded-md text-sm font-medium ${project.teams?.length >= project.number_groups
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                 >
                     <FiPlus className="mr-2" />

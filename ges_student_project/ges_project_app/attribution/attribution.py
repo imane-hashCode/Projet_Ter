@@ -89,26 +89,37 @@ def affecter_projets():
         for etudiant, equipe in affectations.items():
             ProjectAssignment.objects.create(student=etudiant, project=equipe.project, status='pending')
 
-        return f"Affectation terminée avec {len(affectations)} étudiants placés."
+        return {
+            "message": f"Affectation terminée avec {len(affectations)} étudiants attribués.",
+            "assignments_count": len(affectations),
+            "unassigned_count": len(etudiants_non_affectes)
+        }
     
     
     
 def calculer_satisfaction():
-    affectations = Team.objects.all()
+    affectations = ProjectAssignment.objects.all()
+    # Optimisation : Stocker les vœux dans un dictionnaire (évite les requêtes répétées)
+    voeux = Voeux.objects.all()
+    pref_dict = {(v.student_id, v.project_id): v for v in voeux}
+    
     total_score = 0
     max_possible_score = 0
     n_etudiants = affectations.count()
 
     for affectation in affectations:
-        etudiant = affectation.etudiant
-        projet = affectation.projet
-        try:
-            pref = Voeux.objects.get(etudiant=etudiant, projet=projet)
+        etudiant = affectation.student
+        projet = affectation.project
+        # Vérifier si l'étudiant a un vœu pour ce projet
+        if (etudiant.id, projet.id) in pref_dict:
+            pref = pref_dict[(etudiant.id, projet.id)]
             score = calculer_score(pref.rank, pref.note_preference)
-        except Voeux.DoesNotExist:
+        else:
             score = 0  # Étudiant affecté à un projet non choisi
 
         total_score += score
         max_possible_score += calculer_score(1, 10)  # Score idéal
+        
+    score_stisfaction = (total_score / max_possible_score) * 100
 
-    return (total_score / max_possible_score) * 100 if max_possible_score > 0 else 0
+    return  score_stisfaction if max_possible_score > 0 else 0
