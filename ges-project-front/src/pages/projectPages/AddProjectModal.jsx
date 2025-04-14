@@ -14,10 +14,10 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">Créer un nouveau projet</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Créer un nouveau projet</h2>
                         <button
                             onClick={onClose}
                             className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -33,7 +33,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit }) => {
                             {/* Colonne de gauche */}
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                                         Code du projet <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -47,7 +47,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                                         Titre du projet <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -61,7 +61,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                                         Niveau <span className="text-red-500">*</span>
                                     </label>
                                     <select
@@ -82,7 +82,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit }) => {
                             {/* Colonne de droite */}
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                                         Nombre de groupes <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -125,7 +125,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit }) => {
 
                         {/* Description (pleine largeur) */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                                 Description du projet
                             </label>
                             <textarea
@@ -140,7 +140,7 @@ const AddProjectModal = ({ isOpen, onClose, onSubmit }) => {
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                                className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-white dark:hover:bg-gray-800 hover:bg-gray-50 transition-colors"
                             >
                                 Annuler
                             </button>

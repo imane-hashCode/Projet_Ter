@@ -7,7 +7,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="justify-center text-white text-2xl font-bold">
-            <AdminNavBar />
+            {/* <AdminNavBar /> */}
             <h1>Admin Dashboard</h1>
             
             {/* Ajoutez ici le contenu spécifique à l'administrateur */}

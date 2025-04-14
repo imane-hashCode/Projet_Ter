@@ -5,7 +5,6 @@ import StudentNavBar from '../../components/StudentNavBar';
 const StudentDashboard = () => {
     return (
         <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 w-full">
-            <StudentNavBar />
             <div className="flex-1 flex justify-center p-4">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Tableau de bord de l'étudiant

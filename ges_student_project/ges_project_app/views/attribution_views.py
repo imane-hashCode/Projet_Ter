@@ -12,7 +12,15 @@ class ProjectAssignmentView(APIView):
         Lancer l'affectation des étudiants aux projets.
         """
         try:
-            result = affecter_projets()  # Exécuter l'algorithme d'affectation
+            
+            level = request.data.get("level")
+            if level is None:
+                return Response(
+                    {"error": "Le paramètre 'level' est requis."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            result = affecter_projets(level=level)  # Exécuter l'algorithme d'affectation
             return Response(
                 {"message": "Affectation terminée avec succès.", "details": result},
                 status=status.HTTP_201_CREATED
@@ -28,7 +36,16 @@ class ProjectAssignmentView(APIView):
         Récupérer la liste des projets et des étudiants affectés.
         """
         try:
-            assignments = ProjectAssignment.objects.select_related("student__user", "project__supervisor").all()
+            
+            # Récupérer le niveau depuis les paramètres de la requête
+            level = request.query_params.get("level")
+
+            if level is None:
+                return Response(
+                {"error": "Le paramètre 'level' est requis."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            assignments = ProjectAssignment.objects.select_related("student__user", "project__supervisor").filter(project__level=level)
             projects_dict = defaultdict(list)
 
             for assignment in assignments:
@@ -40,7 +57,8 @@ class ProjectAssignmentView(APIView):
                 })
                 
             # Étudiants non affectés (ceux qui ne sont pas dans ProjectAssignment)
-            all_students = set(Student.objects.all())
+            all_students = set(Student.objects.filter(level=level))
+
             assigned_students = set(assignment.student for assignment in assignments)
             unassigned_students = all_students - assigned_students
 
@@ -54,7 +72,8 @@ class ProjectAssignmentView(APIView):
             ]
 
             # Groupes sans projet (équipes qui n'ont pas d'affectation)
-            all_projects = set(Project.objects.all())  # Tous les projets
+            all_projects = set(Project.objects.filter(level=level))
+
             assigned_projects = set(assignment.project for assignment in assignments)  # Projets avec au moins un étudiant
             unassigned_projects = all_projects - assigned_projects  # Différence : projets sans étudiants
 
@@ -69,7 +88,7 @@ class ProjectAssignmentView(APIView):
             ]
 
             # Calcul du score de satisfaction
-            satisfaction_score = calculer_satisfaction()
+            satisfaction_score = calculer_satisfaction(level=level)
             
             response_data = {
                 "projects": [

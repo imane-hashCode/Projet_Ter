@@ -1,10 +1,10 @@
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
-from ges_project_app.models import Voeux, User, Project
+from ges_project_app.models import Voeux, Project, Student
 from ges_project_app.serializers.voeux_serializer import VoeuxSerializer
-from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 from rest_framework.decorators import action
+from collections import defaultdict
 
 class VoeuxViewSet(viewsets.ModelViewSet):
     queryset = Voeux.objects.all()
@@ -17,6 +17,83 @@ class VoeuxViewSet(viewsets.ModelViewSet):
         
         if user.is_authenticated and user.role == 'student':
             return Voeux.objects.filter(student=user.student)
+        
+        elif user.is_authenticated and user.role == 'admin':
+            # Charger tous les vœux
+            voeux = Voeux.objects.select_related('student', 'project').order_by('student', 'rank')
+
+            # Charger tous les étudiants
+            all_students = Student.objects.all()
+
+            # Charger tous les projets
+            all_projects = Project.objects.all()
+
+            # Initialisation de la structure des données
+            students_dict = defaultdict(lambda: {"student": {}, "choices": []})
+            used_projects = set()  # Pour suivre les projets choisis
+            students_with_choices = []
+            students_without_choices = []
+
+            # Remplir la structure avec les vœux existants
+            for voeu in voeux:
+                student_id = voeu.student.id
+
+                if not students_dict[student_id]["student"]:
+                    students_dict[student_id]["student"] = {
+                        "id": voeu.student.id,
+                        "name": voeu.student.user.username,
+                        "level": voeu.student.level
+                    }
+
+                students_dict[student_id]["choices"].append({
+                    "project": {
+                        "id": voeu.project.id,
+                        "code": voeu.project.code,
+                        "title": voeu.project.title
+                    },
+                    "rank": voeu.rank,
+                    "note_preference": voeu.note_preference
+                })
+
+                # Ajouter le projet dans la liste des projets utilisés
+                used_projects.add(voeu.project.id)
+
+            # Séparer les étudiants avec et sans vœux
+            for student in all_students:
+                student_data = {
+                    "id": student.id,
+                    "name": student.user.username,
+                    "level": voeu.student.level,
+                    "choices": students_dict[student.id]["choices"]
+                }
+                if student.id in students_dict and students_dict[student.id]["choices"]:
+                    students_with_choices.append(student_data)
+                else:
+                    students_without_choices.append(student_data)
+
+            # Identifier les projets non choisis
+            unused_projects = [
+                {"id": project.id, "title": project.title}
+                for project in all_projects if project.id not in used_projects
+            ]
+
+            return {
+                "students_with_choices": students_with_choices,
+                "students_without_choices": students_without_choices,
+                "unchoose_projects": unused_projects
+            }
+
+        return Voeux.objects.none()
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        
+        # Si on retourne déjà des données structurées (cas admin), pas besoin de sérialisation
+        if isinstance(queryset, dict):
+            return Response(queryset)
+        
+        # Si c'est un étudiant, DRF s'occupe de la sérialisation classique
+        return super().list(request, *args, **kwargs)
 
     @action(detail=False, methods=['post'])
     def submit_voeux(self, request):

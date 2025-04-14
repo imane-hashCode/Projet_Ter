@@ -6,7 +6,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     supervisor = UserSerializer(read_only=True)
     class Meta:
         model = Project
-        fields = ['id','code', 'title', 'description', 'number_groups', 'supervisor', 'level']
+        fields = ['id','code', 'title', 'description', 'number_groups', 'supervisor', 'level', 'priority']
         
 class TeamSerializer(serializers.ModelSerializer):
     

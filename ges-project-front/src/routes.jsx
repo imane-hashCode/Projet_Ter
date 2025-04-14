@@ -8,18 +8,22 @@ import ProjectList from './pages/studentPages/Projects'
 import VoeuxPage from './pages/studentPages/Voeux';
 import ProjectDetail from './pages/studentPages/ProjectDetail'
 import ProjectListPage from './pages/projectPages/ProjectListPage';
+import ProjectsTeam from './pages/projectPages/ProjectTeam';
 import AssignmentList from './pages/admin/AssignmentList'
+import StudentVoeuxPage from './pages/admin/StudentVoeuxPage';
 
 const AppRoutes = () => {
     return (
-        <Router>
+        
             <Routes>
-                {/* <Route exact path="/" element={Home} /> */}
+                <Route exact path="/" element={<Login />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/projects" element={<ProjectList />} />
                 <Route path="/voeux" element={ <VoeuxPage />}/>
                 <Route path="/projets/:id" element={<ProjectDetail />} />
                 <Route path="/assignment" element= { <AssignmentList /> } />
+                <Route path="/projects_team/:role" element={<ProjectsTeam />} />
+                <Route path="/student-voeux" element={<StudentVoeuxPage />} />
                 <Route
                     path="/dashboard"
                     element={
@@ -37,7 +41,7 @@ const AppRoutes = () => {
                     }
                 />
             </Routes>
-        </Router>
+        
     );
 };
 

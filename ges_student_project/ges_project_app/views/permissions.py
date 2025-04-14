@@ -6,4 +6,4 @@ class IsSupervisorOrAdmin(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        return request.user.role in ['supervisor', 'admin']
+        return request.user.is_authenticated and request.user.role in ["admin", "supervisor"]

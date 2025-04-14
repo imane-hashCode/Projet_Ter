@@ -10,6 +10,7 @@ const ProjectListPage = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    
 
     const [editModal, setEditModal] = useState({
         isOpen: false,
@@ -74,6 +75,7 @@ const ProjectListPage = () => {
                 description: '',
                 level: 'L3',
                 number_groups: 1,
+                priority: false,
                 supervisor: 'current-user-id' // À remplacer par l'ID réel
             }
         });
@@ -142,12 +144,12 @@ const ProjectListPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <SupervisorNavBar />
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            {/* <SupervisorNavBar /> */}
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Liste des Projets</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Liste des Projets</h1>
                     <div className="flex space-x-4">
                         <button
                             onClick={openProjectModal}

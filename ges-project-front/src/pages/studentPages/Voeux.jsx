@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import api from '../../api/axios';
@@ -7,38 +6,31 @@ import StudentNavBar from '../../components/StudentNavBar';
 
 const VoeuxPage = () => {
     const [projects, setProjects] = useState([]);
-    const [voeux, setVoeux] = useState([]);  // Liste des vœux sélectionnés
+    const [voeux, setVoeux] = useState([]);
     const [error, setError] = useState(null);
     const [preferences_note, setPreferences] = useState({});
     const navigate = useNavigate();
 
-    // Fonction pour filtrer les projets disponibles
     const filterAvailableProjects = (allProjects, voeux) => {
         return allProjects.filter(
             project => !voeux.some(voeu => voeu.project.id === project.id)
         );
     };
 
-    // Charger la liste des projets et les vœux existants
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Charger les projets disponibles
                 const projectsResponse = await api.get('/projects/');
                 const allProjects = projectsResponse.data;
 
-                // Charger les vœux existants de l'étudiant
                 const voeuxResponse = await api.get('/voeux/');
                 const existingVoeux = voeuxResponse.data;
 
-                // Mettre à jour les vœux avec les données existantes
                 setVoeux(existingVoeux);
 
-                // Filtrer les projets disponibles pour exclure ceux déjà dans les vœux
                 const availableProjects = filterAvailableProjects(allProjects, existingVoeux);
                 setProjects(availableProjects);
 
-                // Initialiser les notes de préférence
                 const initialPreferences = {};
                 existingVoeux.forEach(voeu => {
                     initialPreferences[voeu.project_id] = voeu.note_preference;
@@ -59,7 +51,6 @@ const VoeuxPage = () => {
         });
     };
 
-    // Gestion du Drag & Drop
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
@@ -68,23 +59,20 @@ const VoeuxPage = () => {
         const newProjects = [...projects];
         const newVoeux = [...voeux];
 
-        // Déplacement d'un projet vers les vœux
         if (source.droppableId === "projects" && destination.droppableId === "voeux") {
-            // const [movedProject] = newProjects.splice(source.index, 1); // Supprime du tableau source
-            const movedProject = newProjects[source.index]; // Trouve l'élément
+            const movedProject = newProjects[source.index];
             newProjects.splice(source.index, 1);
             const newVoeu = {
                 id: `voeu-${movedProject.id}`,
                 project: movedProject,
-                rank: newVoeux.length + 1,  // Ajout en bas de la liste
-                note_preference: 1, // Valeur par défaut
+                rank: newVoeux.length + 1,
+                note_preference: 1,
             };
-            newVoeux.splice(destination.index, 0, newVoeu); // Insère dans le tableau cible
+            newVoeux.splice(destination.index, 0, newVoeu);
 
             setProjects(newProjects);
             setVoeux(newVoeux);
         }
-        // Déplacement d'un vœu vers les projets disponibles
         else if (source.droppableId === "voeux" && destination.droppableId === "projects") {
             const [movedProject] = newVoeux.splice(source.index, 1);
             newProjects.splice(destination.index, 0, movedProject.project);
@@ -92,18 +80,21 @@ const VoeuxPage = () => {
             setProjects(newProjects);
             setVoeux(newVoeux);
         }
-
-        // Réorganisation des vœux
         else if (source.droppableId === "voeux" && destination.droppableId === "voeux") {
-            const [reorderedVoeu] = newVoeux.splice(source.index, 1); // Retirer l'élément déplacé
-            newVoeux.splice(destination.index, 0, reorderedVoeu); // Réinsérer à la bonne position
+            const [reorderedVoeu] = newVoeux.splice(source.index, 1);
+            newVoeux.splice(destination.index, 0, reorderedVoeu);
 
             setVoeux(newVoeux);
         }
     };
 
-    // Soumettre les vœux
     const submitVoeux = async () => {
+        // Vérifier si tous les projets ont été sélectionnés
+        if (projects.length > 0) {
+            setError("Vous devez sélectionner tous les projets disponibles avant de soumettre vos vœux.");
+            return;
+        }
+
         const voeuxData = voeux.map((voeu, index) => ({
             project_id: voeu.project.id,
             rank: index + 1,
@@ -122,7 +113,7 @@ const VoeuxPage = () => {
 
     return (
         <div>
-            <StudentNavBar />
+            {/* <StudentNavBar /> */}
             <h1>Expression des Vœux</h1>
             {error && <div style={{ color: 'red' }}>{error}</div>}
 
@@ -130,75 +121,82 @@ const VoeuxPage = () => {
                 <DragDropContext onDragEnd={handleDragEnd}>
                     {/* Liste des projets disponibles */}
                     {projects.length > 0 && (
-                    <Droppable droppableId="projects">
-                        {(provided) => (
-                            <div className="border p-4 w-1/2">
-                                <h2 className="text-lg font-semibold">Projets disponibles</h2>
-                                <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                                    {projects.map((project, index) => (
-                                        <Draggable key={project.id} draggableId={project.id.toString()} index={index}>
-                                            {(provided) => (
-                                                <li
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    className="p-2 border rounded-lg shadow-md flex justify-between"
-                                                >
-                                                    <span>{project.title}</span>
-                                                    <span className="text-sm text-gray-500">{project.supervisor.username}</span>
-                                                </li>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </ul>
-                            </div>
-                        )}
-                    </Droppable>
+                        <Droppable droppableId="projects">
+                            {(provided) => (
+                                <div className="border p-4 w-1/2">
+                                    <h2 className="text-lg font-semibold">Projets disponibles ({projects.length} restants)</h2>
+                                    <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                                        {projects.map((project, index) => (
+                                            <Draggable key={project.id} draggableId={project.id.toString()} index={index}>
+                                                {(provided) => (
+                                                    <li
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        className="p-2 border rounded-lg shadow-md flex justify-between"
+                                                    >
+                                                        <span>{project.title}</span>
+                                                        <span className="text-sm text-gray-500">{project.supervisor.username}</span>
+                                                    </li>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </ul>
+                                </div>
+                            )}
+                        </Droppable>
                     )}
                     {/* Liste des vœux sélectionnés */}
                     <div className={`border p-4 ${projects.length > 0 ? 'w-1/2' : 'w-full'}`}>
-                    <Droppable droppableId="voeux">
-                        {(provided) => (
-                            // <div className="border p-4 w-1/2">
-                            <>
-                                <h2 className="text-lg font-semibold">Mes Vœux</h2>
-                                <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                                    {voeux.map((voeu, index) => (
-                                        <Draggable key={voeu.id} draggableId={voeu.id.toString()} index={index}>
-                                            {(provided) => (
-                                                <li
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    className="p-2 border rounded-lg shadow-md flex justify-between"
-                                                >
-                                                    <span>{index + 1}. {voeu.project.title}</span>
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        max="20"
-                                                        placeholder={preferences_note[voeu.id] || voeu.note_preference || 1}
-                                                        onChange={(e) => handlePreferenceChange(voeu.project.id, e.target.value)}
-                                                        className="border rounded p-1 text-sm w-16"
-                                                    />
-                                                </li>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </ul>
-                            </>
-                            // </div>
-                        )}
-                    </Droppable>
+                        <Droppable droppableId="voeux">
+                            {(provided) => (
+                                <>
+                                    <h2 className="text-lg font-semibold">Mes Vœux ({voeux.length} sélectionnés)</h2>
+                                    <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                                        {voeux.map((voeu, index) => (
+                                            <Draggable key={voeu.id} draggableId={voeu.id.toString()} index={index}>
+                                                {(provided) => (
+                                                    <li
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        className="p-2 border rounded-lg shadow-md flex justify-between"
+                                                    >
+                                                        <span>{index + 1}. {voeu.project.title}</span>
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            max="20"
+                                                            placeholder={preferences_note[voeu.id] || voeu.note_preference || 1}
+                                                            onChange={(e) => handlePreferenceChange(voeu.project.id, e.target.value)}
+                                                            className="border rounded p-1 text-sm w-16"
+                                                        />
+                                                    </li>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </ul>
+                                </>
+                            )}
+                        </Droppable>
                     </div>
                 </DragDropContext>
             </div>
 
-            <button onClick={submitVoeux} className="mt-4 p-2 bg-blue-500 text-white rounded">
+            <button
+                onClick={submitVoeux}
+                className="mt-4 p-2 bg-blue-500 text-white rounded"
+                disabled={projects.length > 0} // Désactive le bouton si des projets restent
+            >
                 Soumettre mes vœux
             </button>
+            {projects.length > 0 && (
+                <p className="text-red-500 mt-2">
+                    Vous devez sélectionner tous les projets ({projects.length} restants) avant de pouvoir soumettre.
+                </p>
+            )}
         </div>
     );
 };

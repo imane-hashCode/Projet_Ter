@@ -13,10 +13,10 @@ const TeamCreationModal = ({
 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md">
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b">
-                    <h3 className="text-lg font-semibold text-gray-800">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         Créer un groupe pour {project.code}
                     </h3>
                     <button
@@ -30,7 +30,7 @@ const TeamCreationModal = ({
                 {/* Body */}
                 <div className="p-4 space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                             Nom du groupe
                         </label>
                         <input
@@ -46,7 +46,7 @@ const TeamCreationModal = ({
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                                 Étudiants min
                             </label>
                             <input
@@ -62,7 +62,7 @@ const TeamCreationModal = ({
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                                 Étudiants max
                             </label>
                             <input
@@ -83,7 +83,7 @@ const TeamCreationModal = ({
                 <div className="flex justify-end p-4 border-t space-x-3">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800 rounded-md"
                     >
                         Annuler
                     </button>
