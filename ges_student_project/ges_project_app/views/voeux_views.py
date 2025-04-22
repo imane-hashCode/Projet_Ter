@@ -1,10 +1,11 @@
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
-from ges_project_app.models import Voeux, Project, Student
+from ges_project_app.models import Voeux, Project, Student, Deadline
 from ges_project_app.serializers.voeux_serializer import VoeuxSerializer
 from rest_framework import serializers
 from rest_framework.decorators import action
 from collections import defaultdict
+from django.utils import timezone
 
 class VoeuxViewSet(viewsets.ModelViewSet):
     queryset = Voeux.objects.all()
@@ -94,11 +95,23 @@ class VoeuxViewSet(viewsets.ModelViewSet):
         
         # Si c'est un étudiant, DRF s'occupe de la sérialisation classique
         return super().list(request, *args, **kwargs)
+    
+    def check_deadline_passed(self):
+        try:
+            deadline = Deadline.objects.get(type="voeux")
+            if timezone.now().date() > deadline.limite_date:
+                return True
+        except Deadline.DoesNotExist:
+            pass
+        return False
 
     @action(detail=False, methods=['post'])
     def submit_voeux(self, request):
         """Soumettre une liste de préférences pour un étudiant."""
-        print("Données reçues du frontend:", request.data) 
+        # Vérifier si la date limite est dépassée
+        if self.check_deadline_passed():
+            return Response({"error": "La date limite pour soumettre les vœux est dépassée."}, status=400)
+        
         student = request.user.student
         preferences = request.data.get('voeux', [])  # Format : [{"project_id": 1, "preference_order": 1, "preference_score": 5}]
 

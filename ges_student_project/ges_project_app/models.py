@@ -23,6 +23,7 @@ LEVEL_CHOICES = [
     ('M2', 'Master 2'),
 ]
 
+
 class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -119,4 +120,11 @@ class UpdateAssignment(models.Model):
 class ProjectsConflits(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     conflit = models.ForeignKey(Conflit, on_delete=models.CASCADE)
+    
+class Deadline(models.Model):
+    type = models.CharField(max_length=50, choices=[('voeux', 'Voeux')], default='voeux', unique=True)
+    limite_date = models.DateField()
+
+    def __str__(self):
+        return f"Deadline for {self.type}: {self.limite_date}"
 

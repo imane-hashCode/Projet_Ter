@@ -11,6 +11,9 @@ const VoeuxPage = () => {
     const [preferences_note, setPreferences] = useState({});
     const navigate = useNavigate();
 
+    const [deadline, setDeadline] = useState(null);
+    const [deadlinePassed, setDeadlinePassed] = useState(false);
+
     const filterAvailableProjects = (allProjects, voeux) => {
         return allProjects.filter(
             project => !voeux.some(voeu => voeu.project.id === project.id)
@@ -27,6 +30,15 @@ const VoeuxPage = () => {
                 const existingVoeux = voeuxResponse.data;
 
                 setVoeux(existingVoeux);
+
+                const deadlineResponse = await api.get('/deadlines/');
+                const voeuxDeadline = deadlineResponse.data.find(d => d.type === "voeux");
+                if (voeuxDeadline) {
+                    setDeadline(voeuxDeadline);
+                    const currentDate = new Date();
+                    const deadlineDate = new Date(voeuxDeadline.limite_date + "T23:59:59");
+                    setDeadlinePassed(currentDate > deadlineDate);
+                }
 
                 const availableProjects = filterAvailableProjects(allProjects, existingVoeux);
                 setProjects(availableProjects);
@@ -116,6 +128,22 @@ const VoeuxPage = () => {
             {/* <StudentNavBar /> */}
             <h1>Expression des Vœux</h1>
             {error && <div style={{ color: 'red' }}>{error}</div>}
+            {deadline && (
+                <div className={`text-sm font-semibold mt-5 ${deadlinePassed ? 'text-red-500' : 'text-green-500'}`}>
+                    Deadline des vœux: {new Date(deadline.limite_date).toLocaleString()}
+                </div>
+            )}
+            {deadlinePassed ? (
+                <p className="text-red-600 font-semibold mt-4 mb-4">
+                    La date limite pour soumettre vos vœux  est dépassée.
+                    Vous ne pouvez plus les modifier ni les soumettre.
+                </p>
+            ) : (
+                <p className="text-green-600 font-semibold mt-4 mb-4">
+                    Vous pouvez soumettre vos vœux jusqu'à la date limite indiquée ci-dessus.
+                </p>
+            )}
+
 
             <div className="flex space-x-10">
                 <DragDropContext onDragEnd={handleDragEnd}>
@@ -185,17 +213,27 @@ const VoeuxPage = () => {
                 </DragDropContext>
             </div>
 
-            <button
-                onClick={submitVoeux}
-                className="mt-4 p-2 bg-blue-500 text-white rounded"
-                disabled={projects.length > 0} // Désactive le bouton si des projets restent
-            >
-                Soumettre mes vœux
-            </button>
-            {projects.length > 0 && (
-                <p className="text-red-500 mt-2">
-                    Vous devez sélectionner tous les projets ({projects.length} restants) avant de pouvoir soumettre.
+            {deadlinePassed ? (
+                <p className="text-red-600 font-semibold mt-4">
+                    La date limite pour soumettre vos vœux  est dépassée.
+                    Vous ne pouvez plus les modifier ni les soumettre.
                 </p>
+            ) : (
+                <>
+                    <button
+                        onClick={submitVoeux}
+                        className="mt-4 p-2 bg-blue-500 text-white rounded"
+                        disabled={projects.length > 0}
+                    >
+                        Soumettre mes vœux
+                    </button>
+
+                    {projects.length > 0 && (
+                        <p className="text-red-500 mt-2">
+                            Vous devez sélectionner tous les projets ({projects.length} restants) avant de pouvoir soumettre.
+                        </p>
+                    )}
+                </>
             )}
         </div>
     );

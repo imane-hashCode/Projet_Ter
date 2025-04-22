@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FiUser, FiBook, FiAward, FiLoader, FiAlertCircle } from 'react-icons/fi';
+import { FiUser, FiBook, FiAward, FiLoader, FiAlertCircle, FiCalendar } from 'react-icons/fi';
 import api from '../../api/axios';
+import DeadlineModal from './DeadLineModal';
 
 const StudentVoeuxPage = () => {
     const [data, setData] = useState({
@@ -11,6 +12,7 @@ const StudentVoeuxPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('with_choices');
+    const [showDeadlineModal, setShowDeadlineModal] = useState(false);
 
     // Récupérer les données des voeux
     const fetchWishesData = async () => {
@@ -54,70 +56,118 @@ const StudentVoeuxPage = () => {
     }
 
     return (
-        <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
-            <div className="max-w-7xl mx-auto">
-                {/* En-tête simplifié */}
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                        <FiBook className="mr-2 text-blue-500 dark:text-blue-400" />
-                        Gestion des Vœux des Étudiants
-                    </h1>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Consultation des choix formulés par les étudiants
-                    </p>
-                </div>
+        <div className={`min-h-screen`}>
+            <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+                <div className="max-w-7xl mx-auto">
+                    <Header
+                        onOpenModal={() => setShowDeadlineModal(true)}
+                    />
 
-                {/* Contenu principal */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                    <div className="border-b border-gray-200 dark:border-gray-700">
-                        <nav className="flex -mb-px overflow-x-auto">
-                            <TabButton
-                                active={activeTab === 'with_choices'}
-                                onClick={() => setActiveTab('with_choices')}
-                            >
-                                Avec voeux ({data.students_with_choices.length})
-                            </TabButton>
-                            <TabButton
-                                active={activeTab === 'without_choices'}
-                                onClick={() => setActiveTab('without_choices')}
-                            >
-                                Sans voeux ({data.students_without_choices.length})
-                            </TabButton>
-                            <TabButton
-                                active={activeTab === 'unchoose_projects'}
-                                onClick={() => setActiveTab('unchoose_projects')}
-                            >
-                                Projets non choisis ({data.unchoose_projects.length})
-                            </TabButton>
-                        </nav>
-                    </div>
+                    {showDeadlineModal && (
+                        <DeadlineModal onClose={() => setShowDeadlineModal(false)} />
+                    )}
 
-                    <div className="p-6">
-                        {activeTab === 'with_choices' && (
-                            <StudentsWithWishes students={data.students_with_choices} />
-                        )}
-
-                        {activeTab === 'without_choices' && (
-                            <StudentsWithoutWishes students={data.students_without_choices} />
-                        )}
-
-                        {activeTab === 'unchoose_projects' && (
-                            <UnchosenProjects projects={data.unchoose_projects} />
-                        )}
-                    </div>
+                    <MainContent
+                        activeTab={activeTab}
+                        data={data}
+                        // onTabChange={setActiveTab}
+                    />
                 </div>
             </div>
         </div>
     );
+
 };
+
+// Composant d'en-tête
+const Header = ({ onOpenModal }) => (
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
+                <FiBook className="mr-2 text-blue-500 dark:text-blue-400" />
+                Gestion des Vœux
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Consultation des choix des étudiants
+            </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+            <button
+                onClick={onOpenModal}
+                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+            >
+                <FiCalendar className="mr-2" />
+                Gérer la deadline
+            </button>
+        </div>
+    </div>
+);
+// Composant principal
+const MainContent = ({ activeTab, data }) => (
+    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+            {/* En-tête simplifié */}
+            <div className="mb-8">
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                    <FiBook className="mr-2 text-blue-500 dark:text-blue-400" />
+                    Gestion des Vœux des Étudiants
+                </h1>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Consultation des choix formulés par les étudiants
+                </p>
+            </div>
+
+            {/* Contenu principal */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                <div className="border-b border-gray-200 dark:border-gray-700">
+                    <nav className="flex -mb-px overflow-x-auto">
+                        <TabButton
+                            active={activeTab === 'with_choices'}
+                            onClick={() => setActiveTab('with_choices')}
+                        >
+                            Avec voeux ({data.students_with_choices.length})
+                        </TabButton>
+                        <TabButton
+                            active={activeTab === 'without_choices'}
+                            onClick={() => setActiveTab('without_choices')}
+                        >
+                            Sans voeux ({data.students_without_choices.length})
+                        </TabButton>
+                        <TabButton
+                            active={activeTab === 'unchoose_projects'}
+                            onClick={() => setActiveTab('unchoose_projects')}
+                        >
+                            Projets non choisis ({data.unchoose_projects.length})
+                        </TabButton>
+                    </nav>
+                </div>
+
+                <div className="p-6">
+                    {activeTab === 'with_choices' && (
+                        <StudentsWithWishes students={data.students_with_choices} />
+                    )}
+
+                    {activeTab === 'without_choices' && (
+                        <StudentsWithoutWishes students={data.students_without_choices} />
+                    )}
+
+                    {activeTab === 'unchoose_projects' && (
+                        <UnchosenProjects projects={data.unchoose_projects} />
+                    )}
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
 // Composants enfants
 const TabButton = ({ children, active = false, onClick }) => (
     <button
         onClick={onClick}
         className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${active
-                ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
     >
         {children}

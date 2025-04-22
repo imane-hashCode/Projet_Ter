@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from collections import defaultdict
 from ges_project_app.models import ProjectAssignment, Student, Project
-from ges_project_app.attribution.attribution import affecter_projets, calculer_satisfaction
+from ges_project_app.attribution import attribution, gale_shapley_attribution
 import json
 
 class ProjectAssignmentView(APIView):
@@ -20,7 +20,7 @@ class ProjectAssignmentView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
                 
-            result = affecter_projets(level=level)  # Exécuter l'algorithme d'affectation
+            result = gale_shapley_attribution.affectation_projet(level=level)  # Exécuter l'algorithme d'affectation
             return Response(
                 {"message": "Affectation terminée avec succès.", "details": result},
                 status=status.HTTP_201_CREATED
@@ -88,7 +88,8 @@ class ProjectAssignmentView(APIView):
             ]
 
             # Calcul du score de satisfaction
-            satisfaction_score = calculer_satisfaction(level=level)
+            # satisfaction_score = attribution.calculer_satisfaction(level=level)
+            satisfaction_score = gale_shapley_attribution.calculer_satisfaction(level=level)
             
             response_data = {
                 "projects": [

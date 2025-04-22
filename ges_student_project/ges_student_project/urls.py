@@ -8,6 +8,7 @@ from ges_project_app.views.project_views import ProjectViewSet, TeamViewSet, Pro
 from ges_project_app.views.voeux_views import VoeuxViewSet
 from ges_project_app.views.attribution_views import ProjectAssignmentView
 from ges_project_app.views.assignStudentToTeamView import AssignStudentsToTeamsView
+from ges_project_app.views.deadLineView import DeadlineViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -16,6 +17,8 @@ router.register(r'projects',ProjectViewSet)
 router.register(r'teams', TeamViewSet)
 router.register(r'voeux', VoeuxViewSet)
 router.register(r'students', StudentViewSet)
+router.register(r'deadlines', DeadlineViewSet)
+
 
 
 urlpatterns = [
