@@ -11,6 +11,8 @@ import ProjectListPage from './pages/projectPages/ProjectListPage';
 import ProjectsTeam from './pages/projectPages/ProjectTeam';
 import AssignmentList from './pages/admin/AssignmentList'
 import StudentVoeuxPage from './pages/admin/StudentVoeuxPage';
+import RequestChangePage from './pages/studentPages/RequestChangeForm';
+import StudentsRequest from './pages/admin/StudentsRequest';
 
 const AppRoutes = () => {
     return (
@@ -24,6 +26,8 @@ const AppRoutes = () => {
                 <Route path="/assignment" element= { <AssignmentList /> } />
                 <Route path="/projects_team/:role" element={<ProjectsTeam />} />
                 <Route path="/student-voeux" element={<StudentVoeuxPage />} />
+                <Route path="/request-change" element={<RequestChangePage />} />
+                <Route path="/students-request" element={<StudentsRequest />} />
                 <Route
                     path="/dashboard"
                     element={

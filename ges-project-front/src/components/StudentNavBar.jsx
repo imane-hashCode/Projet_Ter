@@ -35,6 +35,7 @@ const StudentNavBar = () => {
         { name: 'Projets', to: '/projects' },
         { name: 'Vœux', to: '/voeux' },
         { name: 'Groupes', to: '/projects_team/admin' },
+        { name: 'Demande de changement', to: '/request-change' },
     ];
 
 

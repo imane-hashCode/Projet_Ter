@@ -4,9 +4,12 @@ from rest_framework import status
 from collections import defaultdict
 from ges_project_app.models import ProjectAssignment, Student, Project
 from ges_project_app.attribution import attribution, gale_shapley_attribution
-import json
+from .permissions import IsAdmin    
 
 class ProjectAssignmentView(APIView):
+    
+    # permission_classes = [IsAdmin]
+    
     def post(self, request, format=None):
         """
         Lancer l'affectation des étudiants aux projets.
@@ -19,8 +22,10 @@ class ProjectAssignmentView(APIView):
                     {"error": "Le paramètre 'level' est requis."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+            
+            # result = attribution.affecter_projets(level=level) 
+            result = gale_shapley_attribution.affectation_projet(level=level)
                 
-            result = gale_shapley_attribution.affectation_projet(level=level)  # Exécuter l'algorithme d'affectation
             return Response(
                 {"message": "Affectation terminée avec succès.", "details": result},
                 status=status.HTTP_201_CREATED
@@ -74,8 +79,8 @@ class ProjectAssignmentView(APIView):
             # Groupes sans projet (équipes qui n'ont pas d'affectation)
             all_projects = set(Project.objects.filter(level=level))
 
-            assigned_projects = set(assignment.project for assignment in assignments)  # Projets avec au moins un étudiant
-            unassigned_projects = all_projects - assigned_projects  # Différence : projets sans étudiants
+            assigned_projects = set(assignment.project for assignment in assignments)
+            unassigned_projects = all_projects - assigned_projects
 
             unassigned_projects_list = [
                 {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
-import StudentNavBar from '../../components/StudentNavBar';
 
 const ProjectList = () => {
     const [projects, setProjects] = useState([]);

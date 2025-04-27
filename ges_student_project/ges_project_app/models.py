@@ -82,15 +82,6 @@ class StudentsTeams(models.Model):
     def __str__(self):
         return f"{self.student} in {self.team}"
     
-class Conflit(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="conflits")
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="conflits")
-    description = models.TextField()
-    statut = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
-
-    def __str__(self):
-        return f"Conflit: {self.student} vs {self.project} ({self.statut})"
-
 
 class ProjectAssignment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="assignments")
@@ -108,18 +99,6 @@ class ProjectAssignment(models.Model):
     def __str__(self):
         return f"Assignment: {self.student} -> {self.project} ({self.statut})"
 
-class UpdateAssignment(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="updates")
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="updates")
-    raison = models.TextField()
-    statut = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
-
-    def __str__(self):
-        return f"Update: {self.student} -> {self.project} ({self.statut})"
-
-class ProjectsConflits(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    conflit = models.ForeignKey(Conflit, on_delete=models.CASCADE)
     
 class Deadline(models.Model):
     type = models.CharField(max_length=50, choices=[('voeux', 'Voeux')], default='voeux', unique=True)
@@ -127,4 +106,21 @@ class Deadline(models.Model):
 
     def __str__(self):
         return f"Deadline for {self.type}: {self.limite_date}"
+    
+class ChangeRequest(models.Model):
+    
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="change_requests")
+    current_project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
+    current_team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
+    desired_project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True, related_name="requested_changes")
+    desired_team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name="requested_changes")
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+    processed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"Demande de {self.student} ({self.status})"
+
 

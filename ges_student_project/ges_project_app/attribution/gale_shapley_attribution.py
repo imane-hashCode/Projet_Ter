@@ -120,7 +120,7 @@ def calculer_satisfaction(level):
             score = 0  # Projet non choisi
 
         total_score += score
-        max_possible_score += calculer_score(1, 20, total_projects)  # Score idéal
+        max_possible_score += calculer_score(1, 20, total_projects)
 
     score_satisfaction = (total_score / max_possible_score) * 100 if max_possible_score > 0 else 0
     return score_satisfaction

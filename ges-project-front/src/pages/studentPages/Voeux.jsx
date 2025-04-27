@@ -130,7 +130,7 @@ const VoeuxPage = () => {
             {error && <div style={{ color: 'red' }}>{error}</div>}
             {deadline && (
                 <div className={`text-sm font-semibold mt-5 ${deadlinePassed ? 'text-red-500' : 'text-green-500'}`}>
-                    Deadline des vœux: {new Date(deadline.limite_date).toLocaleString()}
+                    Date limite de soumission des vœux: {deadline.limite_date}
                 </div>
             )}
             {deadlinePassed ? (

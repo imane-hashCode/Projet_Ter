@@ -4,9 +4,6 @@ from django.db import transaction
 from ges_project_app.models import ProjectAssignment, Student, Project, Voeux, Team
 
 
-
-
-
 def calculer_score(rank, note_preference, total_projects, alpha=0.6, beta=0.4):
     if not (0 <= note_preference <= 20):
         raise ValueError("La note doit être entre 0 et 20.")
@@ -14,20 +11,16 @@ def calculer_score(rank, note_preference, total_projects, alpha=0.6, beta=0.4):
         raise ValueError(f"Le rang doit être entre 1 et {total_projects}.")
     return alpha * (total_projects + 1 - rank) + beta * note_preference
 
-# def calculer_score(rang, note, alpha=0.6, beta=0.4):
-#     return alpha * (11 - rang) + beta * note
-
-# Fonction principale d'affectation
 def affecter_projets(level):
-    with transaction.atomic():  # Sécurise la transaction
-        ProjectAssignment.objects.filter(project__level=level).delete()  # Réinitialise les affectations pour ce niveau
+    with transaction.atomic():
+        ProjectAssignment.objects.filter(project__level=level).delete()
 
         # Stockage des scores {Projet: [(score, étudiant)]}
         scores = defaultdict(list)
 
         # Récupération des vœux des étudiants pour le niveau donné
         preferences = Voeux.objects.filter(project__level=level, student__level=level)
-        etudiants_ayant_fait_un_voeu = set()  # Stocke les étudiants qui ont exprimé un choix
+        etudiants_ayant_fait_un_voeu = set()
         
         for pref in preferences:
             total_projects = Project.objects.filter(level=level).count()
@@ -48,26 +41,26 @@ def affecter_projets(level):
 
         # Affectation aux projets prioritaires
         for projet in Project.objects.filter(priority=True, level=level):
-            if projet not in scores or not scores[projet]:  # ✅ Vérifie si le projet a été choisi
+            if projet not in scores or not scores[projet]:
                 continue
 
             equipes_projet = [equipe for equipe in equipes_disponibles if equipe.project == projet]
             if equipes_projet:
-                _, etudiant = scores[projet].pop(0)  # Prendre le meilleur étudiant
-                equipe_choisie = equipes_projet[0]  # Première équipe dispo
+                _, etudiant = scores[projet].pop(0)
+                equipe_choisie = equipes_projet[0]
                 affectations[etudiant] = equipe_choisie
                 equipes_disponibles[equipe_choisie] -= 1
 
         # Affectation générale des étudiants
         for projet, etudiants_scores in scores.items():
             equipes_projet = [equipe for equipe in equipes_disponibles if equipe.project == projet]
-            if not equipes_projet:  # ✅ Vérifie qu'il y a des équipes dispos
+            if not equipes_projet:
                 continue
 
             while etudiants_scores:
                 equipe_courante = next((e for e in equipes_projet if equipes_disponibles[e] > 0), None)
                 if not equipe_courante:
-                    break  # Plus de place
+                    break 
 
                 # Sélection des meilleurs étudiants
                 meilleurs_scores = etudiants_scores[:equipes_disponibles[equipe_courante]]
@@ -132,11 +125,11 @@ def calculer_satisfaction(level):
             total_projects = Project.objects.filter(level=level).count()
             score = calculer_score(pref.rank, pref.note_preference, total_projects)
         else:
-            score = 0  # Étudiant affecté à un projet non choisi
+            score = 0
 
         total_score += score
         total_projects = Project.objects.filter(level=level).count()
-        max_possible_score += calculer_score(1, 20, total_projects)  # Score idéal
+        max_possible_score += calculer_score(1, 20, total_projects)
         
     score_stisfaction = (total_score / max_possible_score) * 100
 

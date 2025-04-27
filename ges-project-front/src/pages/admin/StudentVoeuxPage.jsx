@@ -70,7 +70,7 @@ const StudentVoeuxPage = () => {
                     <MainContent
                         activeTab={activeTab}
                         data={data}
-                        // onTabChange={setActiveTab}
+                        onTabChange={setActiveTab}
                     />
                 </div>
             </div>
@@ -104,19 +104,9 @@ const Header = ({ onOpenModal }) => (
     </div>
 );
 // Composant principal
-const MainContent = ({ activeTab, data }) => (
+const MainContent = ({ activeTab, data, onTabChange }) => (
     <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div className="max-w-7xl mx-auto">
-            {/* En-tête simplifié */}
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                    <FiBook className="mr-2 text-blue-500 dark:text-blue-400" />
-                    Gestion des Vœux des Étudiants
-                </h1>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Consultation des choix formulés par les étudiants
-                </p>
-            </div>
 
             {/* Contenu principal */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -124,19 +114,19 @@ const MainContent = ({ activeTab, data }) => (
                     <nav className="flex -mb-px overflow-x-auto">
                         <TabButton
                             active={activeTab === 'with_choices'}
-                            onClick={() => setActiveTab('with_choices')}
+                            onClick={() => onTabChange('with_choices')}
                         >
                             Avec voeux ({data.students_with_choices.length})
                         </TabButton>
                         <TabButton
                             active={activeTab === 'without_choices'}
-                            onClick={() => setActiveTab('without_choices')}
+                            onClick={() => onTabChange('without_choices')}
                         >
                             Sans voeux ({data.students_without_choices.length})
                         </TabButton>
                         <TabButton
                             active={activeTab === 'unchoose_projects'}
-                            onClick={() => setActiveTab('unchoose_projects')}
+                            onClick={() => onTabChange('unchoose_projects')}
                         >
                             Projets non choisis ({data.unchoose_projects.length})
                         </TabButton>

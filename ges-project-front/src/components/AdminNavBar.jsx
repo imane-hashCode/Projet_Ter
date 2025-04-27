@@ -37,6 +37,8 @@ const AdminNavBar = () => {
         { name: 'Projets', to: '/projects_listes' },
         { name: 'Groupes', to: '/projects_team/admin' },
         { name: 'Voeux', to: '/student-voeux' },
+        { name: 'Demandes Etudiants', to: '/students-request' },
+        
     ];
 
     // Vérifie si la route actuelle correspond
